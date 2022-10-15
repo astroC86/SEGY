@@ -111,7 +111,7 @@ try:
 except:
   root = '/kaggle/working/SEGY/python_segy/data/test'
 
-train_data = datagenerator(data_dir = root,patch_size = (256,256),stride = (64,64),train_data_num = float("inf"),download=True,datasets =1,aug_times=0,scales = [1,0.9,0.8],verbose=False,jump=1,agc=True)
+train_data = datagenerator(data_dir = root,patch_size = (256,256),stride = (64,64),train_data_num = float("-inf"),download=True,datasets =1,aug_times=0,scales = [1,0.9,0.8],verbose=False,jump=1,agc=True)
 train_data = train_data.astype(np.float32)
 torch.set_default_dtype(torch.float32)
 xs = train_data.transpose((0, 3, 1, 2))
