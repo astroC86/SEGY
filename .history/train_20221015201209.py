@@ -111,15 +111,11 @@ try:
 except:
   root = '/kaggle/working/SEGY/python_segy/data/test'
 
-train_data = datagenerator(data_dir = root,patch_size = (256,256),stride = (64,64),train_data_num = float("-inf"),download=True,datasets =1,aug_times=0,scales = [1,0.9,0.8],verbose=False,jump=0,agc=False)
+train_data = datagenerator(data_dir = root,patch_size = (256,256),stride = (64,64),train_data_num =float("-inf"),download=True,datasets =1,aug_times=0,scales = [1,0.9,0.8],verbose=False,jump=0,agc=False)
 train_data = train_data.astype(np.float32)
 torch.set_default_dtype(torch.float32)
 xs = train_data.transpose((0, 3, 1, 2))
-
-train_size = int(0.8 * len(xs))
-test_size = len(xs) - train_size
-train_dataset, test_dataset = torch.utils.data.random_split(xs, [train_size, test_size])
-
+print("<XS>:", xs.shape)
 DDataset = DataLoaderTrain(xs,50,{'patch_size': Train['TRAIN_PS']})
 #VDataset = DataLoaderVal(xs,50,{'patch_size': Train['TRAIN_PS']})
 
