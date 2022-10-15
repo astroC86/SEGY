@@ -159,9 +159,11 @@ for epoch in range(start_epoch, OPT['EPOCHS'] + 1):
         # Forward propagation
         for param in model_restored.parameters():
             param.grad = None
-        target = data[0].cuda().float()
-        input_ = data[1].cuda().float()
-        restored = model_restored(input_).float()
+        target = data[0].cuda()
+        input_ = data[1].cuda()
+        input_=input_.float()
+        target = target.float()
+        restored = model_restored(input_)
 
         # Compute loss
         #loss = Charbonnier_loss(restored, target)

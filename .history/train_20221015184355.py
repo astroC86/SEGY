@@ -161,7 +161,7 @@ for epoch in range(start_epoch, OPT['EPOCHS'] + 1):
             param.grad = None
         target = data[0].cuda().float()
         input_ = data[1].cuda().float()
-        restored = model_restored(input_).float()
+        restored = model_restored(input_)
 
         # Compute loss
         #loss = Charbonnier_loss(restored, target)
