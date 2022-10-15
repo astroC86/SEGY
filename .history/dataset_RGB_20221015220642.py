@@ -20,7 +20,7 @@ class DataLoaderTrain(Dataset):
         self.sigma = sigma
     
     def __len__(self):
-        return len(self.xs)
+        return self.xs.size()[0]
 
     def __getitem__(self, index):
         index_ = index % self.xs.shape[0]
@@ -160,7 +160,7 @@ class DataLoaderVal(Dataset):
         self.ps = self.img_options['patch_size']
 
     def __len__(self):
-        return len(self.xs)
+        return self.xs.size()[0]
 
     def __getitem__(self, index):
         index_ = index %  self.xs.shape[0]
