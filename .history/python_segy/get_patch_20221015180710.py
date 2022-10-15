@@ -82,6 +82,7 @@ def irregular_mask(data,rate):
     return mask
 
 def regular_mask(data,a):
+
     """the mask matrix of regular sampling
     Args:
         data: original data patches

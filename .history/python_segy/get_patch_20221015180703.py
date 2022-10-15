@@ -42,6 +42,7 @@ class DownsamplingDataset(Dataset):
         else:
             mask = irregular_mask(batch_x,self.rate)
         batch_y = mask.mul(batch_x)
+                
         return batch_y, batch_x,mask
 
     def __len__(self):
@@ -82,6 +83,7 @@ def irregular_mask(data,rate):
     return mask
 
 def regular_mask(data,a):
+
     """the mask matrix of regular sampling
     Args:
         data: original data patches
