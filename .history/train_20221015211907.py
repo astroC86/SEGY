@@ -127,7 +127,7 @@ VDataset = DataLoaderVal(test_dataset,50,{'patch_size': Train['TRAIN_PS']})
 train_loader = DataLoader(dataset=DDataset, batch_size=OPT['BATCH'],
                           shuffle=True, num_workers=0, drop_last=False)
 #val_dataset = get_validation_data(val_dir, {'patch_size': Train['VAL_PS']})
-val_loader = DataLoader(dataset=VDataset, batch_size=1, shuffle=False, num_workers=0,
+val_loader = DataLoader(dataset=DDataset, batch_size=1, shuffle=False, num_workers=0,
                         drop_last=False)
 
 
