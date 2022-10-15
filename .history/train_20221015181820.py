@@ -161,7 +161,6 @@ for epoch in range(start_epoch, OPT['EPOCHS'] + 1):
             param.grad = None
         target = data[0].cuda()
         input_ = data[1].cuda()
-        print("INPUT_: ",input_.shape)
         restored = model_restored(input_)
 
         # Compute loss
@@ -181,7 +180,6 @@ for epoch in range(start_epoch, OPT['EPOCHS'] + 1):
         for ii, data_val in enumerate(val_loader, 0):
             target = data_val[0].cuda()
             input_ = data_val[1].cuda()
-            print("INPUT_: ",input_.shape)
             with torch.no_grad():
                 restored = model_restored(input_)
 

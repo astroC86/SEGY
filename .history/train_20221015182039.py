@@ -161,7 +161,6 @@ for epoch in range(start_epoch, OPT['EPOCHS'] + 1):
             param.grad = None
         target = data[0].cuda()
         input_ = data[1].cuda()
-        print("INPUT_: ",input_.shape)
         restored = model_restored(input_)
 
         # Compute loss
