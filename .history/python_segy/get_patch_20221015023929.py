@@ -9,13 +9,8 @@ from torch.utils.data import Dataset
 import torch
 import numpy as np
 from progressbar import *
-if __name__ == '__main__':
-    from gain import *
-    from download_data import *
-else:
-    from .gain import *
-    from .download_data import *
-
+from .gain import *
+from .download_data import *
 import matplotlib.pyplot as plt
 import random
 import numpy as np
@@ -60,7 +55,7 @@ class DenoisingDataset(Dataset):
         self.sigma = sigma
 
     def __getitem__(self, index):
-        batch_x =  self.xs[index]
+        batch_x =  torch.from_numpy(self.xs[index])
         noise   = torch.randn(batch_x.size()).mul_(self.sigma/255.0)
         batch_y = batch_x + noise
         return batch_y, batch_x
@@ -376,12 +371,12 @@ if __name__ == '__main__':
     '''
     root (string): the .segy file exists or will be saved to if download is set to True.
     '''
-    root = '/home/astroc/Projects/SEGY/python_segy/data/test'
+    root = 'data/test'
     train_data  = datagenerator(data_dir = root,patch_size = (128,128),stride = (32,32),train_data_num =1000,download=False,datasets =0,aug_times=9,scales = [1,0.9,0.8],verbose=False,jump=80,agc=False)
     train_data = train_data.astype(np.float64)
     torch.set_default_dtype(torch.float64)
     #just show some data sample form train_data
     xs = torch.from_numpy(train_data.transpose((0, 3, 1, 2)))
     DDataset = DenoisingDataset(xs,50)
-    #DDataset = DownsamplingDataset(xs,4,regular = True)
+#    DDataset = DownsamplingDataset(xs,4,regular = True)
     patch_show(DDataset,save=True,root = root) # show and save the 4 samples data

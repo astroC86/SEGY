@@ -8,8 +8,8 @@ class SUNet_model(nn.Module):
         self.config = config
         self.swin_unet = SUNet(img_size=config['SWINUNET']['IMG_SIZE'],
                                patch_size=config['SWINUNET']['PATCH_SIZE'],
-                               in_chans=1,
-                               out_chans=1,
+                               in_chans=3,
+                               out_chans=3,
                                embed_dim=config['SWINUNET']['EMB_DIM'],
                                depths=config['SWINUNET']['DEPTH_EN'],
                                num_heads=config['SWINUNET']['HEAD_NUM'],
@@ -30,10 +30,10 @@ class SUNet_model(nn.Module):
         return logits
     
 if __name__ == '__main__':
-    import yaml
-    import torch
-    from thop import profile
     from utils.model_utils import network_parameters
+    import torch
+    import yaml
+    from thop import profile
     from utils.model_utils import network_parameters
 
     ## Load yaml configuration file

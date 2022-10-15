@@ -9,13 +9,8 @@ from torch.utils.data import Dataset
 import torch
 import numpy as np
 from progressbar import *
-if __name__ == '__main__':
-    from gain import *
-    from download_data import *
-else:
-    from .gain import *
-    from .download_data import *
-
+from python_segy.gain import *
+from python_segy..download_data import *
 import matplotlib.pyplot as plt
 import random
 import numpy as np
@@ -60,7 +55,7 @@ class DenoisingDataset(Dataset):
         self.sigma = sigma
 
     def __getitem__(self, index):
-        batch_x =  self.xs[index]
+        batch_x =  torch.from_numpy(self.xs[index])
         noise   = torch.randn(batch_x.size()).mul_(self.sigma/255.0)
         batch_y = batch_x + noise
         return batch_y, batch_x
@@ -383,5 +378,5 @@ if __name__ == '__main__':
     #just show some data sample form train_data
     xs = torch.from_numpy(train_data.transpose((0, 3, 1, 2)))
     DDataset = DenoisingDataset(xs,50)
-    #DDataset = DownsamplingDataset(xs,4,regular = True)
+#    DDataset = DownsamplingDataset(xs,4,regular = True)
     patch_show(DDataset,save=True,root = root) # show and save the 4 samples data

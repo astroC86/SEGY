@@ -97,25 +97,17 @@ L1_loss = nn.L1Loss()
 print('==> Loading datasets')
 
 
-# train_data = datagenerator("/home/astroc/Projects/SEGY",patch_size = (256,256),
-#                            stride = (64,64), train_data_num = float('inf'), 
-#                            download=True,datasets=1,aug_times=0,scales = [1],
-#                            verbose=True,jump=1,agc=True)
+train_data = datagenerator("/home/astroc/Projects/SEGY",patch_size = (256,256),
+                           stride = (64,64), train_data_num = float('inf'), 
+                           download=True,datasets=1,aug_times=0,scales = [1],
+                           verbose=True,jump=1,agc=True)
 
 train_dataset = get_training_data(train_dir, {'patch_size': Train['TRAIN_PS']})
-root = '/home/astroc/Projects/SEGY/python_segy/data/test'
-train_data  = datagenerator(data_dir = root,patch_size = (256,256),stride = (64,64),train_data_num =1000,download=False,datasets =0,aug_times=9,scales = [1,0.9,0.8],verbose=False,jump=80,agc=False)
-train_data = train_data.astype(np.float64)
-torch.set_default_dtype(torch.float64)
-#just show some data sample form train_data
-xs = torch.from_numpy(train_data.transpose((0, 3, 1, 2)))
-DDataset = DenoisingDataset(xs,50)
-
-train_loader = DataLoader(dataset=DDataset, batch_size=OPT['BATCH'],
-                          shuffle=True, num_workers=0, drop_last=False)
+#train_loader = DataLoader(dataset=train_dataset, batch_size=OPT['BATCH'],
+#                          shuffle=True, num_workers=0, drop_last=False)
 #val_dataset = get_validation_data(val_dir, {'patch_size': Train['VAL_PS']})
-val_loader = DataLoader(dataset=DDataset, batch_size=1, shuffle=False, num_workers=0,
-                        drop_last=False)
+#val_loader = DataLoader(dataset=val_dataset, batch_size=1, shuffle=False, num_workers=0,
+#                        drop_last=False)
 
 
 
@@ -204,7 +196,7 @@ for epoch in range(start_epoch, OPT['EPOCHS'] + 1):
             epoch, ssim_val_rgb, best_epoch_ssim, best_ssim))
 
         """ 
-        # Save every epochs of model
+        # Save evey epochs of model
         torch.save({'epoch': epoch,
                     'state_dict': model_restored.state_dict(),
                     'optimizer': optimizer.state_dict()

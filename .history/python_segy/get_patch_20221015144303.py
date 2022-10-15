@@ -382,6 +382,6 @@ if __name__ == '__main__':
     torch.set_default_dtype(torch.float64)
     #just show some data sample form train_data
     xs = torch.from_numpy(train_data.transpose((0, 3, 1, 2)))
-    DDataset = DenoisingDataset(xs,50)
-    #DDataset = DownsamplingDataset(xs,4,regular = True)
+    #DDataset = DenoisingDataset(xs,50)
+    DDataset = DownsamplingDataset(xs,4,regular = True)
     patch_show(DDataset,save=True,root = root) # show and save the 4 samples data

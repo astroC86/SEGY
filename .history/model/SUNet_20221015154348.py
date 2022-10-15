@@ -25,7 +25,7 @@ class SUNet_model(nn.Module):
 
     def forward(self, x):
         if x.size()[1] == 1:
-            x = x.repeat(1, 3, 1, 1)
+            x = x.repeat(1, 1, 1, 1)
         logits = self.swin_unet(x)
         return logits
     

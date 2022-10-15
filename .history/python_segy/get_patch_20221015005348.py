@@ -9,13 +9,8 @@ from torch.utils.data import Dataset
 import torch
 import numpy as np
 from progressbar import *
-if __name__ == '__main__':
-    from gain import *
-    from download_data import *
-else:
-    from .gain import *
-    from .download_data import *
-
+from gain import *
+from download_data import *
 import matplotlib.pyplot as plt
 import random
 import numpy as np
@@ -60,8 +55,8 @@ class DenoisingDataset(Dataset):
         self.sigma = sigma
 
     def __getitem__(self, index):
-        batch_x =  self.xs[index]
-        noise   = torch.randn(batch_x.size()).mul_(self.sigma/255.0)
+        batch_x = self.xs[index]
+        noise = torch.randn(batch_x.size()).mul_(self.sigma/255.0)
         batch_y = batch_x + noise
         return batch_y, batch_x
 
@@ -220,9 +215,8 @@ def gen_patches(data,patch_size =(64,64),stride = (32,32),
                 file = 1, file_list = 1,
                 total_patches_num=None,
                 train_data_num=float('inf'),
-                patch_num = None, 
-                aug_times=[], scales = [],
-                q = None, single_patches_num=None, verbose=None):
+                patch_num = None, aug_times=[], 
+                scales = [],q = None,single_patches_num=None,verbose=None):
     '''
     Args:
         aug_time(list): Corresponding function data_aug, if aug_time=[],mean don`t use the aug
@@ -236,6 +230,7 @@ def gen_patches(data,patch_size =(64,64),stride = (32,32),
 
     patches = []
     num = q*single_patches_num
+    
 
     for s in scales:
         h_scaled, w_scaled = int(h*s),int(w*s)
@@ -271,9 +266,7 @@ def gen_patches(data,patch_size =(64,64),stride = (32,32),
        
     return patches,patch_num
 
-def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32), 
-                  train_data_num = float('inf'), download=True, datasets = "Hess_VTI",
-                  aug_times=0, scales = [1], verbose=True, jump=1, agc=True):
+def datagenerator(data_dir,patch_size = (128,128),stride = (32,32), train_data_num = float('inf'),download=True,datasets = "Hess_VTI",aug_times=0,scales = [1],verbose=True,jump=1,agc=True):
     '''
     Args:
         data_dir : the path of the .segy file exit
@@ -338,7 +331,7 @@ def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32),
                 p_h,p_w = patch_size
                 s_h,s_w = stride
                 single_patches_num = int(_compute_total_patches(h, w, p_h, p_w,s_h,s_w,aug_times,scales,max_patches=None))
-                
+
                 if verbose:
                     total_patches_num =  single_patches_num*select_shot_num                  
                     patches, patch_num = gen_patches(data,patch_size,stride,i,len(file_list),total_patches_num,train_data_num,patch_num,aug_times,scales,q,single_patches_num,verbose)
@@ -358,30 +351,27 @@ def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32),
             if verbose:
                 print(' ')
             f.close()
-    
-    data_dir = data_dir[:-1] if data_dir.endswith("/") else data_dir
-    all_patches   =  np.asarray(all_patches)
-    all_patches_f = np.memmap(f'{data_dir}/data_{str(patch_size[0])}_{str(stride[0])}', dtype='float64', mode='w+', shape=all_patches.shape)
-    all_patches_f[:] = all_patches[:]
-    all_patches_f = np.expand_dims(all_patches_f, axis=3)
+
+    all_patches = np.expand_dims(all_patches, axis=3)
 
     #When the number of generated patches is an integer multiple of batch, run the following two lines of code.
 #    discard_n = len(all_patches)-len(all_patches)//batch_size*batch_size   
 #    all_patches = np.delete(all_patches, range(discard_n), axis=0)
-    print(str(len(all_patches_f))+' '+'training data finished')
-    print("Finished mapping file")
+    print(str(len(all_patches))+' '+'training data finished')
+    all_patches_f = np.memmap(f'data_{str(patch_size[0])}_{str(stride[0])}', dtype='float64', mode='w+', shape=all_patches.shape)
+    all_patches_f[:] = all_patches[:]
     return all_patches_f
 
 if __name__ == '__main__':
     '''
     root (string): the .segy file exists or will be saved to if download is set to True.
     '''
-    root = '/home/astroc/Projects/SEGY/python_segy/data/test'
+    root = 'data/test'
     train_data  = datagenerator(data_dir = root,patch_size = (128,128),stride = (32,32),train_data_num =1000,download=False,datasets =0,aug_times=9,scales = [1,0.9,0.8],verbose=False,jump=80,agc=False)
     train_data = train_data.astype(np.float64)
     torch.set_default_dtype(torch.float64)
     #just show some data sample form train_data
     xs = torch.from_numpy(train_data.transpose((0, 3, 1, 2)))
     DDataset = DenoisingDataset(xs,50)
-    #DDataset = DownsamplingDataset(xs,4,regular = True)
+#    DDataset = DownsamplingDataset(xs,4,regular = True)
     patch_show(DDataset,save=True,root = root) # show and save the 4 samples data

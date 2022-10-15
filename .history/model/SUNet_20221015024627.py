@@ -30,10 +30,10 @@ class SUNet_model(nn.Module):
         return logits
     
 if __name__ == '__main__':
-    import yaml
-    import torch
-    from thop import profile
     from utils.model_utils import network_parameters
+    import torch
+    import yaml
+    from thop import profile
     from utils.model_utils import network_parameters
 
     ## Load yaml configuration file

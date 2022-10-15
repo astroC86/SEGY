@@ -6,10 +6,8 @@ from PIL import Image
 from torch.utils.data import Dataset
 import torchvision.transforms.functional as TF
 
-"""
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in ['jpeg', 'JPEG', 'jpg', 'png', 'JPG', 'PNG', 'gif'])
-"""
 
 class DataLoaderTrain(Dataset):
     def __init__(self,xs, sigma,img_options=None) -> None:

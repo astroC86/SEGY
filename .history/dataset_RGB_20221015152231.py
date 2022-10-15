@@ -6,10 +6,35 @@ from PIL import Image
 from torch.utils.data import Dataset
 import torchvision.transforms.functional as TF
 
-"""
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in ['jpeg', 'JPEG', 'jpg', 'png', 'JPG', 'PNG', 'gif'])
-"""
+
+def data_aug(img, mode=None):
+    # data augmentation
+    if mode == 0:
+        # original
+        return img
+    if mode == 1:
+        # flip up and down
+        return np.flipud(img)
+    elif mode == 2:
+        # rotate counterwise 90 degree
+        return np.rot90(img)
+    elif mode == 3:
+        # rotate 90 degree and flip up and down
+        return np.flipud(np.rot90(img))
+    elif mode == 4:
+        # rotate 180 degree
+        return np.rot90(img, k=2)
+    elif mode == 5:
+        # rotate 180 degree and flip
+        return np.flipud(np.rot90(img, k=2))
+    elif mode == 6:
+        # rotate 270 degree
+        return np.rot90(img, k=3)
+    elif mode == 7:
+        # rotate 270 degree and flip
+        return np.flipud(np.rot90(img, k=3))
 
 class DataLoaderTrain(Dataset):
     def __init__(self,xs, sigma,img_options=None) -> None:
@@ -162,7 +187,7 @@ class DataLoaderVal(Dataset):
         self.ps = self.img_options['patch_size']
 
     def __len__(self):
-        return self.xs.size(0)
+        return self.sizex
 
     def __getitem__(self, index):
         index_ = index % self.sizex
@@ -182,6 +207,47 @@ class DataLoaderVal(Dataset):
         return tar_img, inp_img, ""
 
 """
+class DataLoaderVal(Dataset):
+    def __init__(self, rgb_dir, img_options=None, rgb_dir2=None):
+        super(DataLoaderVal, self).__init__()
+
+        inp_files = sorted(os.listdir(os.path.join(rgb_dir, 'input')))
+        tar_files = sorted(os.listdir(os.path.join(rgb_dir, 'target')))
+
+        self.inp_filenames = [os.path.join(rgb_dir, 'input', x) for x in inp_files if is_image_file(x)]
+        self.tar_filenames = [os.path.join(rgb_dir, 'target', x) for x in tar_files if is_image_file(x)]
+
+        self.img_options = img_options
+        self.sizex = len(self.tar_filenames)  # get the size of target
+
+        self.ps = self.img_options['patch_size']
+
+    def __len__(self):
+        return self.sizex
+
+    def __getitem__(self, index):
+        index_ = index % self.sizex
+        ps = self.ps
+
+        inp_path = self.inp_filenames[index_]
+        tar_path = self.tar_filenames[index_]
+
+        inp_img = Image.open(inp_path).convert('RGB')
+        tar_img = Image.open(tar_path).convert('RGB')
+
+        # Validate on center crop
+        if self.ps is not None:
+            inp_img = TF.center_crop(inp_img, (ps, ps))
+            tar_img = TF.center_crop(tar_img, (ps, ps))
+
+        inp_img = TF.to_tensor(inp_img)
+        tar_img = TF.to_tensor(tar_img)
+
+        filename = os.path.splitext(os.path.split(tar_path)[-1])[0]
+
+        return tar_img, inp_img, filename
+"""
+
 class DataLoaderTest(Dataset):
     def __init__(self, inp_dir, img_options):
         super(DataLoaderTest, self).__init__()
@@ -202,22 +268,3 @@ class DataLoaderTest(Dataset):
 
         inp = TF.to_tensor(inp)
         return inp, filename
-"""
-
-class DataLoaderTest(Dataset):
-    def __init__(self, xs, sigma, img_options=None):
-        super(DataLoaderTest, self).__init__()
-        self.xs = xs
-        self.sigma = sigma
-        self.img_options = img_options
-
-    def __len__(self):
-        return self.xs.size(0)
-
-    def __getitem__(self, index):
-        index_ = index % self.sizex
-        tar_img =  self.xs[index_]
-        noise   = torch.randn(tar_img.size()).mul_(self.sigma/255.0)
-        inp_img = tar_img + noise
-
-        return tar_img, inp_img, ""

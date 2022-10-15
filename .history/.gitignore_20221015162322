@@ -1,0 +1,5 @@
+./Model94_shots.segy
+./Model94_shots.segy.gz
+./python_segy/data/test/data_128_32
+./history
+./python_segy/models_denoise/DnCNN_sigma50/model.pth
