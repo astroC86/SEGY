@@ -13,8 +13,6 @@ import utils
 import numpy as np
 import random
 from data_RGB import get_training_data, get_validation_data
-from dataset_RGB import DataLoaderTrain, DataLoaderVal, DataLoaderTest
-
 
 from warmup_scheduler import GradualWarmupScheduler
 from tqdm import tqdm
@@ -105,14 +103,14 @@ print('==> Loading datasets')
 #                            verbose=True,jump=1,agc=True)
 
 #train_dataset = get_training_data(train_dir, {'patch_size': Train['TRAIN_PS']})
-root = '/kaggle/working/SEGY/python_segy/data/test'
+root = '/home/astroc/Projects/SEGY/python_segy/data/test'
 train_data  = datagenerator(data_dir = root,patch_size = (256,256),stride = (64,64),train_data_num =1000,download=False,datasets =0,aug_times=9,scales = [1,0.9,0.8],verbose=False,jump=80,agc=False)
 train_data = train_data.astype(np.float64)
 torch.set_default_dtype(torch.float64)
 #just show some data sample form train_data
-xs = train_data.transpose((0, 3, 1, 2))
-DDataset = DataLoaderTrain(xs,50,{'patch_size': Train['TRAIN_PS']})
-#VDataset = DataLoaderVal(xs,50,{'patch_size': Train['TRAIN_PS']})
+xs = torch.from_numpy(train_data.transpose((0, 3, 1, 2)))
+DDataset = DataLoaderTrain(xs,50)
+DDataset = DenoisingDataset(xs,50)
 
 
 train_loader = DataLoader(dataset=DDataset, batch_size=OPT['BATCH'],
