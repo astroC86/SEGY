@@ -215,7 +215,7 @@ class DataLoaderTest(Dataset):
         return self.xs.shape[0]
 
     def __getitem__(self, index):
-        index_ = index %  self.xs.shape[0]
+        index_ = index % self.sizex
         tar_img = torch.from_numpy(self.xs[index_])
         noise   = torch.randn(tar_img.size()).mul_(self.sigma/255.0)
         inp_img = tar_img + noise
