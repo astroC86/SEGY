@@ -312,9 +312,10 @@ def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32),
         with segyio.open(file_list[i],'r',ignore_geometry=True) as f:
             f.mmap()
             sourceX = f.attributes(segyio.TraceField.SourceX)[:]
-            trace_num = len(sourceX)#number of trace, The sourceX under the same shot is the same character.
+            trace_num = len(sourceX) #number of trace, The sourceX under the same shot is the same character.
             shot_num = len(set(sourceX))#shot number 
-            len_shot = trace_num//shot_num #The length of the data in each shot data
+            len_shot = trace_num//shot_num #The length of the data in each shot data\
+            print(f'{trace_num} {shot_num} {len_shot}')
             '''
             The data of each shot is read separately
             The default is that the data dimensions collected by all shots in the file are the same.
@@ -376,7 +377,7 @@ if __name__ == '__main__':
     root (string): the .segy file exists or will be saved to if download is set to True.
     '''
     root = '/home/astroc/Projects/SEGY/python_segy/data/test'
-    train_data  = datagenerator(data_dir = root,patch_size = (256,256),stride = (64,64),train_data_num =1000,download=False,datasets =0,aug_times=9,scales = [1,0.9,0.8],verbose=False,jump=80,agc=False)
+    train_data  = datagenerator(data_dir = root,patch_size = (96,96),stride = (16,16),train_data_num =1000,download=False,datasets =0,aug_times=9,scales = [1,0.9,0.8],verbose=False,jump=1,agc=False)
     train_data = train_data.astype(np.float64)
     torch.set_default_dtype(torch.float64)
     #just show some data sample form train_data
