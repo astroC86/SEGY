@@ -174,6 +174,7 @@ class DataLoaderVal(Dataset):
             inp_img = TF.center_crop(inp_img, (ps, ps))
             tar_img = TF.center_crop(tar_img, (ps, ps))
 
+
         return tar_img, inp_img, ""
 
 """
