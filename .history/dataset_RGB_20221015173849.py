@@ -24,7 +24,7 @@ class DataLoaderTrain(Dataset):
     def __get_item__(self, index):
         index_ = index % self.xs.size(0)
         ps = self.ps
-        tar_img =  torch.from_numpy(self.xs[index_])
+        tar_img =  self.xs[index_]
         noise   = torch.randn(tar_img.size()).mul_(self.sigma/255.0)
         inp_img = tar_img + noise
 

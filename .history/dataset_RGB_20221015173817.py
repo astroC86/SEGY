@@ -24,7 +24,7 @@ class DataLoaderTrain(Dataset):
     def __get_item__(self, index):
         index_ = index % self.xs.size(0)
         ps = self.ps
-        tar_img =  torch.from_numpy(self.xs[index_])
+        tar_img =  self.xs[index_]
         noise   = torch.randn(tar_img.size()).mul_(self.sigma/255.0)
         inp_img = tar_img + noise
 
@@ -162,12 +162,12 @@ class DataLoaderVal(Dataset):
         self.ps = self.img_options['patch_size']
 
     def __len__(self):
-        return self.xs.shape[0]
+        return self.xs.size(0)
 
     def __getitem__(self, index):
         index_ = index % self.sizex
         ps = self.ps
-        tar_img =  torch.from_numpy(self.xs[index_])
+        tar_img =  self.xs[index_]
         noise   = torch.randn(tar_img.size()).mul_(self.sigma/255.0)
         inp_img = tar_img + noise
 
@@ -216,7 +216,7 @@ class DataLoaderTest(Dataset):
 
     def __getitem__(self, index):
         index_ = index % self.sizex
-        tar_img = torch.from_numpy(self.xs[index_])
+        tar_img =  self.xs[index_]
         noise   = torch.randn(tar_img.size()).mul_(self.sigma/255.0)
         inp_img = tar_img + noise
 
