@@ -314,7 +314,7 @@ def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32),
             sourceX = f.attributes(segyio.TraceField.SourceX)[:]
             trace_num = len(sourceX) #number of trace, The sourceX under the same shot is the same character.
             shot_num = len(set(sourceX))#shot number 
-            len_shot = trace_num//shot_num #The length of the data in each shot data
+            len_shot = trace_num//shot_num #The length of the data in each shot data\
             '''
             The data of each shot is read separately
             The default is that the data dimensions collected by all shots in the file are the same.

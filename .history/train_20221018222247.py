@@ -48,9 +48,10 @@ mode = opt['MODEL']['MODE']
 
 try:
   import google.colab
-  Train['SAVE_DIR'] = '/content/drive/MyDrive/checkpoints'
+  Train['SAVE_DIR'] = '/content/drive/MyDrive/checkpoints/'
   os.makedirs(Train['SAVE_DIR'], exist_ok=True)
-except: pass
+except:
+    pass
 
 model_dir = os.path.join(Train['SAVE_DIR'], mode, 'models')
 utils.mkdir(model_dir)
