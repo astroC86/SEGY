@@ -171,8 +171,8 @@ for epoch in range(start_epoch, OPT['EPOCHS'] + 1):
         # Forward propagation
         for param in model_restored.parameters():
             param.grad = None
-        target = data[0].cuda().float().repeat(1, 3, 1, 1)
-        input_ = data[1].cuda().float().repeat(1, 3, 1, 1)
+        target = data[0].cuda().float()
+        input_ = data[1].cuda().float()
         restored = model_restored(input_).float()
 
         # Compute loss
