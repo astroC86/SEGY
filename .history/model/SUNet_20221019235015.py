@@ -27,7 +27,7 @@ class SUNet_model(nn.Module):
         if x.size()[1] == 1:
             x = x.repeat(1, 3, 1, 1)
         logits = self.swin_unet(x)
-        return logits[:, 1, :, :,]
+        return logits
     
 if __name__ == '__main__':
     import yaml
