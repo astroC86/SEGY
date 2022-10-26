@@ -9,6 +9,7 @@ from torch.utils.data import Dataset
 import torch
 import numpy as np
 from progressbar import *
+import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     from gain import *
@@ -250,7 +251,7 @@ def gen_patches(data,patch_size =(64,64),stride = (32,32),
                     if verbose:
                         progress_bar(num,total_patches_num,patch_num,file,file_list)
 
-                    if patch_num>=train_data_num:
+                    if patch_num >= train_data_num:
                         return patches,patch_num
 
                     for k in range(0,aug_times):
@@ -269,7 +270,17 @@ def gen_patches(data,patch_size =(64,64),stride = (32,32),
 
        
     return patches,patch_num
-
+"""
+                fig = plt.figure(figsize=(12, 8))
+                ax = fig.add_subplot(1, 1, 1)
+                twt = f.samples
+                vm = np.percentile(data, 99)
+                extent = [1, trace_num, twt[-1], twt[0]]  # define extent
+                ax.imshow(data, cmap="RdBu", vmin=-vm, vmax=vm, aspect='auto', extent=extent)
+                ax.set_xlabel('CDP number')
+                ax.set_ylabel('TWT [ms]')
+                plt.show()
+"""
 def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32), 
                   train_data_num = float('inf'), download=True, datasets = "Hess_VTI",
                   aug_times=0, scales = [1], verbose=True, jump=1, agc=True):
@@ -311,10 +322,11 @@ def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32),
     for i in range(len(file_list)):
         with segyio.open(file_list[i],'r',ignore_geometry=True) as f:
             f.mmap()
-            sourceX = f.attributes(segyio.TraceField.SourceX)[:]
-            trace_num = len(sourceX) #number of trace, The sourceX under the same shot is the same character.
-            shot_num = len(set(sourceX))#shot number 
-            len_shot = trace_num//shot_num #The length of the data in each shot data
+            sourceX   = f.attributes(segyio.TraceField.SourceX)[:]
+            trace_num = f.tracecount        # Number of traces, The sourceX under the same shot is the same character.
+            shot_num  = len(set(sourceX))   # Shot number 
+            len_shot  = trace_num//shot_num # The length of the data in each shot data
+            print(f'\nSHOT LEN: {len_shot} \nTRACE EN: {trace_num}\nSHOT NUM: {shot_num}')
             '''
             The data of each shot is read separately
             The default is that the data dimensions collected by all shots in the file are the same.
@@ -323,7 +335,8 @@ def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32),
             '''
             q = -1
             for j in range(0,shot_num,jump):
-                data = np.asarray([np.copy(x) for x in f.trace[j*len_shot:(j+1)*len_shot]]).T
+                data = np.asarray([np.copy(x) for x in f.trace[j*len_shot:(j+1)*len_shot]]).T  
+                print(f'DATA LEN: {data.shape}\n')              
                 q += 1
                 if agc:
                     data = gain(data,0.004,'agc',0.05,1)
@@ -333,24 +346,29 @@ def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32),
                 # Number of shots used to generate the patch
                 select_shot_num = len(list(range(0,shot_num,jump)))
 
-                h, w = data.shape
-                p_h,p_w = patch_size
-                s_h,s_w = stride
+                h   , w   = data.shape
+                p_h , p_w = patch_size
+                s_h , s_w = stride
                 single_patches_num = int(_compute_total_patches(h, w, p_h, p_w,s_h,s_w,aug_times,scales,max_patches=None))
-                
+                #print(f'>>>>>>>{len(range(0, w-p_w+1, s_w))*len(range(0, h-p_h+1, s_h))}<<<<<<<<')
                 if verbose:
                     total_patches_num =  single_patches_num*select_shot_num                  
                     patches, patch_num = gen_patches(data,patch_size,stride,i,len(file_list),total_patches_num,train_data_num,patch_num,aug_times,scales,q,single_patches_num,verbose)
                 else:
+                    #print(f'patch num before: {patch_num}')
                     patches, patch_num = gen_patches(data,patch_size,stride,i,len(file_list),train_data_num = train_data_num,patch_num=patch_num,aug_times=aug_times,scales=scales,q = q,single_patches_num=single_patches_num)
-
+                    #print(f'patch num after: {patch_num}')
+                #print(f'<<<<<<{patch_num}>>>>>>>')
                 for patch in patches:
                     all_patches.append(patch)
                     if len(all_patches) >= train_data_num:
                         f.close()
                         if verbose:
                             print(' ')
+                        all_patches   =  np.asarray(all_patches)
+                        print(f'@@@@@@@@{all_patches.shape}@@@@@@')
                         all_patches = np.expand_dims(all_patches, axis=3)
+                        print(f'$$$$$$$${all_patches.shape}$$$$$$')
                         print(str(len(all_patches))+' '+'training data finished')
                         return all_patches
 
@@ -360,6 +378,7 @@ def datagenerator(data_dir:str,patch_size = (128,128), stride = (32,32),
     
     data_dir = data_dir[:-1] if data_dir.endswith("/") else data_dir
     all_patches   =  np.asarray(all_patches)
+    print(f'$$$$$$$${all_patches.shape}$$$$$$')
     all_patches_f = np.memmap(f'{data_dir}/data_{str(patch_size[0])}_{str(stride[0])}', dtype='float64', mode='w+', shape=all_patches.shape)
     all_patches_f[:] = all_patches[:]
     all_patches_f = np.expand_dims(all_patches_f, axis=3)
@@ -376,7 +395,7 @@ if __name__ == '__main__':
     root (string): the .segy file exists or will be saved to if download is set to True.
     '''
     root = '/home/astroc/Projects/SEGY/python_segy/data/test'
-    train_data  = datagenerator(data_dir = root,patch_size = (96,96),stride = (16,16),train_data_num =1000,download=False,datasets =0,aug_times=9,scales = [1,0.9,0.8],verbose=False,jump=1,agc=False)
+    train_data  = datagenerator(data_dir = root,patch_size = (96,96),stride = (16,16),train_data_num =6000,download=True,datasets =1,aug_times=0,scales = [1], verbose=False,jump=1,agc=False)
     train_data = train_data.astype(np.float64)
     torch.set_default_dtype(torch.float64)
     #just show some data sample form train_data
